@@ -1,0 +1,193 @@
+<html>
+  <head>
+    <script
+      src="https://cdn.jsdelivr.net/npm/p5@1.0.0/lib/p5.js"
+      type="text/javascript"
+    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha3/0.8.0/sha3.min.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.7/dat.gui.min.js"
+      integrity="sha512-LF8ZB1iTwi4Qvkm4pekHG4a437Y9Af5ZuwbnW4GTbAWQeR2E4KW8WF+xH8b9psevV7wIlDMx1MH9YfPqgKhA/Q=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script>
+      //   let tokenData = {
+      //       hash: "0x08bd82ce02b3b149582e7ab57cdb2c5d021b0f67c66c10036fbae4bc2da3987f",
+      //       tokenId: "100000000",
+      //   };
+      let features = {};
+
+      function get_timestamp() {
+        return new Date()
+          .toISOString()
+          .replace(/[^T0-9]/g, "")
+          .replace("T", "_");
+      }
+      let tokenData = {
+        hash: "0x" + keccak256(get_timestamp()),
+        // hash: "0x" + keccak256("1138"),
+        // hash: "0x8f2e1aaaeb17c59b16e18dc68d2cf18e78e6e7dcefe198d73cad2820d8544647",
+        // hash: "0x4a99dbd07b5e12b5a5f9291a46249c70286fbc0f3b713872f87211f0f2772756",
+        tokenId: "18000000",
+      };
+      function download() {
+        save(`${tokenData.hash}_${get_timestamp()}.jpg`);
+      }
+    </script>
+    <script
+      src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"
+      type="application/javascript"
+    ></script>
+    <script>
+      const contractJson = {
+        address: "0xcb08ffd984a556a477a63ae06dd306f42912fba2",
+        abi: [
+          {
+            anonymous: false,
+            inputs: [
+              {
+                indexed: true,
+                internalType: "uint256",
+                name: "tokenId",
+                type: "uint256",
+              },
+              {
+                indexed: false,
+                internalType: "bytes32",
+                name: "tokenHash",
+                type: "bytes32",
+              },
+            ],
+            name: "NewTokenHash",
+            type: "event",
+          },
+          {
+            anonymous: false,
+            inputs: [
+              {
+                indexed: true,
+                internalType: "uint256",
+                name: "timestamp",
+                type: "uint256",
+              },
+              {
+                indexed: false,
+                internalType: "uint256",
+                name: "actionType",
+                type: "uint256",
+              },
+              {
+                indexed: false,
+                internalType: "string",
+                name: "actionText",
+                type: "string",
+              },
+              {
+                indexed: false,
+                internalType: "string",
+                name: "actionTarget",
+                type: "string",
+              },
+              {
+                indexed: true,
+                internalType: "address",
+                name: "requester",
+                type: "address",
+              },
+            ],
+            name: "PochiAction",
+            type: "event",
+          },
+          {
+            inputs: [],
+            name: "totalSupply",
+            outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+            stateMutability: "view",
+            type: "function",
+          },
+        ],
+      };
+      const address = contractJson.address;
+      const provider = ethers.getDefaultProvider("rinkeby");
+      const contract = new ethers.Contract(address, contractJson.abi, provider);
+      const ACTION_VALID_IN_SECONDS = 6000;
+
+      async function handleActions() {
+        const actionFilter = contract.filters.PochiAction();
+
+        const allActions = await contract.queryFilter(actionFilter);
+        console.log("allActions", allActions);
+        const sorted = allActions.sort((a, b) => {
+          return a.blockNumber - b.blockNumber;
+        });
+        const currTime = Date.now() / 1000;
+        const filteredActions = sorted.filter((a) => {
+          return (
+            currTime - a.args.timestamp.toNumber() < ACTION_VALID_IN_SECONDS
+          );
+        });
+        console.log("filteredActions", filteredActions);
+        if (filteredActions.length == 0) {
+          console.log("No actions to perform");
+        } else {
+          const lastAction = filteredActions[filteredActions.length - 1];
+          console.log("lastAction", lastAction);
+          // performPochiAction(0,"hi","all",currTime,"0xabcdef")
+          performPochiAction(
+            lastAction.args.actionType.toNumber(),
+            lastAction.args.actionText,
+            lastAction.args.actionTarget,
+            lastAction.args.timestamp.toNumber(),
+            lastAction.args.requester,
+            lastAction.blockNumber
+          );
+        }
+      }
+
+      (async () => {
+        try {
+          console.log("Contract found at: %s", address);
+          const supply = (await contract.totalSupply()).toNumber();
+          console.log("totalSupply %d", supply);
+
+          const actionFilter = contract.filters.PochiAction();
+          provider.on(actionFilter, async (logData) => {
+            try {
+              await handleActions();
+            } catch (error) {
+              console.log(error);
+            }
+          });
+
+          handleActions();
+        } catch (error) {
+          console.log(error);
+        }
+      })();
+    </script>
+    <script src="mySketch.js" type="text/javascript"></script>
+    <style type="text/css">
+      html,
+      body {
+        overflow: hidden;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      canvas {
+        padding: 0;
+        margin: auto;
+        display: block;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+    </style>
+  </head>
+
+  <body></body>
+</html>
