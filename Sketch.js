@@ -159,9 +159,9 @@ class Area {
     mainGraphics.fill(R.random_choice(this.colors));
     mainGraphics.rect(this.x, this.y, this.w, this.h);
     //debug type text
-    mainGraphics.fill(255, 0, 0);
-    mainGraphics.textSize(30);
-    mainGraphics.text(this.type, this.x + 50, this.y + 50);
+    // mainGraphics.fill(255, 0, 0);
+    // mainGraphics.textSize(30);
+    // mainGraphics.text(this.type, this.x + 50, this.y + 50);
     mainGraphics.pop();
   }
   affect(particle) {
@@ -301,10 +301,10 @@ let particleCounts = {
   },
 };
 let particleSizes = {
-  XS: {
-    weight: 2,
-    value: 30,
-  },
+  // XS: {
+  //   weight: 2,
+  //   value: 30,
+  // },
   S: {
     weight: 5,
     value: 45,
@@ -324,23 +324,23 @@ let particleSizes = {
 };
 let areaTypes = {
   field: {
-    weight: 8,
+    weight: 20,
     value: "field",
   },
   curl: {
-    weight: 2,
+    weight: 3,
     value: "curl",
   },
   noise: {
-    weight: 1,
+    weight: 2,
     value: "noise",
   },
   square: {
-    weight: 1,
+    weight: 2,
     value: "square",
   },
   step: {
-    weight: 1,
+    weight: 5,
     value: "step",
   },
   none: {
@@ -352,7 +352,7 @@ let areaTypes = {
 
 let divisionTypes = {
   rect: {
-    weight: 1,
+    weight: 10,
     value: "rect"
   },
   ang: {
@@ -560,7 +560,7 @@ function setup() {
         ),
         v: createVector(0, 1)
           .rotate(R.random_num(0, 2 * PI))
-          .mult(R.random_num(3, 7)),
+          .mult(R.random_num(2, 6)),
         color: pColor,
       })
     );
@@ -604,6 +604,14 @@ function draw() {
   blendMode(MULTIPLY);
   image(canvasTexture, 0, 0, 1920 * 1.15, 1080 * 1.15);
   pop();
+
+  fill(0)
+  textSize(20)
+  
+  textFont("Courier")
+  select('canvas').elt.style.letterSpacing = "5px";
+  text(tokenData.hash,30,height-30)
+
 }
 
 function keyPressed() {
