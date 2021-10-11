@@ -159,9 +159,9 @@ class Area {
     mainGraphics.fill(R.random_choice(this.colors));
     mainGraphics.rect(this.x, this.y, this.w, this.h);
     //debug type text
-    // mainGraphics.fill(255, 0, 0);
-    // mainGraphics.textSize(30);
-    // mainGraphics.text(this.type, this.x + 50, this.y + 50);
+    mainGraphics.fill(255, 0, 0);
+    mainGraphics.textSize(30);
+    mainGraphics.text(this.type, this.x + 50, this.y + 50);
     mainGraphics.pop();
   }
   affect(particle) {
@@ -182,6 +182,10 @@ class Area {
       particle.v.x += cos(particle.p.x / 10 + particle.p.y / 20) / 2;
       particle.v.y += sin(particle.p.y / 10 + particle.p.x / 20) / 2;
     }
+    if (this.type=="step"){
+      particle.p.x += cos(int(particle.p.x/40)*2 )*2;
+      particle.p.y += cos(int(particle.p.y/40)*2 )*2;
+    }
   }
   isParticleInArea(particle) {
     let rectCheckFunc = (area, p) =>
@@ -193,6 +197,29 @@ class Area {
 
     return checkFunc(this, particle);
   }
+}
+
+class AngArea extends Area{
+  constructor(args){
+    super(args)
+  }
+  draw(){
+    let useR =(this.stR+this.edR)/2 
+    mainGraphics.push()
+    mainGraphics.strokeCap(SQUARE)
+      mainGraphics.noFill()
+      mainGraphics.stroke(R.random_choice(this.colors));
+      mainGraphics.translate(width/2,height/2)
+      mainGraphics.strokeWeight(this.edR-this.stR)
+      mainGraphics.arc(0,0,useR,useR,this.stAng,this.edAng,OPEN)
+    mainGraphics.pop()
+  }
+  isParticleInArea(particle) { 
+    let pAng = atan2(particle.p.y- height/2,particle.p.x-width/2)
+    let pR = dist(particle.p.x,particle.p.y,width/2,height/2)
+    return pAng >= this.stAng && pAng <=this.edAng && pR> this.stR && pR< this.edR
+  }
+
 }
 
 let overAllTexture;
@@ -249,7 +276,11 @@ let colors = {
   },
 };
 let startPositions = {
-  Center: [0.5, 0.5],
+  Center: {
+    weight: 10,
+    value: [0.5, 0.5]
+    
+  },
   CornerLT: [0.3, 0.3],
   CornerRT: [0.7, 0.3],
   CornerLB: [0.3, 0.7],
@@ -308,11 +339,33 @@ let areaTypes = {
     weight: 1,
     value: "square",
   },
+  step: {
+    weight: 1,
+    value: "step",
+  },
+  none: {
+    weight: 1,
+    value: "none",
+  },
+
 };
+
+let divisionTypes = {
+  rect: {
+    weight: 1,
+    value: "rect"
+  },
+  ang: {
+    weight: 10,
+    value: "ang"
+  }
+
+}
 let useStartPosition;
 let useParticleCount;
 let useColorSet;
 let useParticleSize;
+let useDivisionType
 let mainGraphics;
 let areas = [];
 
@@ -330,6 +383,7 @@ let allFeatureList = {
   StartPosition: mapListToWeightedKeys(startPositions),
   ParticleCount: mapListToWeightedKeys(particleCounts),
   ParticleSize: mapListToWeightedKeys(particleSizes),
+  DivisionType: mapListToWeightedKeys(divisionTypes),
   // RailType: {
   //   Sine: 20,
   //   Triangle: 5,
@@ -356,6 +410,10 @@ function renderFeatures() {
 
   features.ParticleSize = R.random_choice_weight(allFeatureList.ParticleSize);
   useParticleSize = getValueOfList(particleSizes, features.ParticleSize);
+
+
+  features.DivisionType = R.random_choice_weight(allFeatureList.DivisionType);
+  useDivisionType = getValueOfList(divisionTypes, features.DivisionType);
 }
 
 function preload() {
@@ -402,19 +460,14 @@ function div(x, y, w, h, z) {
   }
 }
 
-function divAng(stR, edR, stAng, edAng, d, colors) {
-  if (random() < 0.15) {
-    colors = random([colors1, colors2]);
-  }
-  push();
-  if (random() < 0.3) {
+function divAng(stR, edR, stAng, edAng, d) {
+  if (R.random() < 0.3) {
     d -= 1;
-    // return
   }
-  let ratio = random(0.3, 0.7);
+  let ratio = R.random_num(0.3, 0.7);
   if (d > 0) {
-    if (random() < 0.35) {
-      let splitNum = random([2, 2, 2, 2, 2, 3]);
+    if (R.random() < 0.4) {
+      let splitNum = R.random_choice([2, 2, 2, 2, 2, 3,4]);
       for (var o = 1; o <= splitNum; o++) {
         divAng(
           stR,
@@ -423,25 +476,39 @@ function divAng(stR, edR, stAng, edAng, d, colors) {
           stAng + (o * (edAng - stAng)) / splitNum,
           d - 1
         );
-      }
-      // divAng(stR,edR,
-      // 			 stAng,
-      // 			 stAng+ratio*(edAng-stAng),d-1)
-      // divAng(stR,edR,
-      // 			 stAng+ratio*(edAng-stAng),
-      // 			 edAng,d-1)
+      } 
     } else {
       divAng(stR, stR + ratio * (edR - stR), stAng, edAng, d - 1);
       divAng(stR + ratio * (edR - stR), edR, stAng, edAng, d - 1);
     }
+  }else{
+    let newArea = new AngArea({
+      stR, edR, stAng, edAng, d,
+      type: getValueOfList(
+        areaTypes,
+        R.random_choice_weight(mapListToWeightedKeys(areaTypes))
+      ),
+      sx: R.random_num(0, 2),
+      sy: R.random_num(0, 2),
+      noiseX: R.random_num(0, 100),
+      noiseY: R.random_num(0, 1000),
+      noiseXAmp: R.random_num(-5, 5),
+      noiseYAmp: R.random_num(-5, 5),
+      gravity: createVector(
+        R.random_num(-0.15, 0.15),
+        R.random_num(-0.15, 0.15)
+      ),
+      colors: useColorSet,
+    });
+    newArea.draw();
+    areas.push(newArea);
   }
-  pop();
 }
 
 let particles = [];
 let ang;
 function setup() {
-  pixelDensity(2);
+  // pixelDensity(2);
   createCanvas(1200, 1200);
   mainGraphics = createGraphics(width, height);
   background(100);
@@ -475,7 +542,12 @@ function setup() {
   rotate(ang);
   translate(-width / 2, -height / 2);
 
-  div(0, 0, width, height, int(R.random_num(2, 4)));
+  if (useDivisionType=="rect"){
+    div(0, 0, width, height, int(R.random_num(2, 4)));
+  }
+  if (useDivisionType=="ang"){
+    divAng(0, width*2, 0, 360, int(R.random_num(2, 6)));
+  }
   features.AreaCount = areas.length;
 
   for (var i = 0; i < useParticleCount; i++) {
