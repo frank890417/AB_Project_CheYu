@@ -215,6 +215,10 @@ let particleSizes = {
     weight: 4,
     value: 70,
   },
+  XL: {
+    weight: 2,
+    value: 85,
+  },
 };
 let useStartPosition;
 let useParticleCount;
@@ -448,10 +452,10 @@ function draw() {
 
   image(mainGraphics, 0, 0);
 
-  // push();
-  // blendMode(MULTIPLY);
-  // image(canvasTexture, 0, 0, 1920 * 1.15, 1080 * 1.15);
-  // pop();
+  push();
+  blendMode(MULTIPLY);
+  image(canvasTexture, 0, 0, 1920 * 1.15, 1080 * 1.15);
+  pop();
 }
 
 /*
