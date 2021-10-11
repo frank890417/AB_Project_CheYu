@@ -131,9 +131,13 @@ class Area {
       y: 0,
       w: 0,
       h: 0,
-      type: getValueOfList(areaTypes, R.random_choice_weight(areaTypes)),
+      type: getValueOfList(
+        areaTypes,
+        R.random_choice_weight(mapListToWeightedKeys(areaTypes))
+      ),
       sx: R.random_num(0, 2),
       sy: R.random_num(0, 2),
+      polarAmp: R.random_num(-5, 5),
       noiseX: R.random_num(0, 100),
       noiseY: R.random_num(0, 1000),
       noiseXAmp: R.random_num(-5, 5),
@@ -150,9 +154,15 @@ class Area {
     console.log(this);
   }
   draw() {
+    mainGraphics.push();
     mainGraphics.noStroke();
     mainGraphics.fill(R.random_choice(this.colors));
     mainGraphics.rect(this.x, this.y, this.w, this.h);
+    //debug type text
+    // mainGraphics.fill(255, 0, 0);
+    // mainGraphics.textSize(30);
+    // mainGraphics.text(this.type, this.x + 50, this.y + 50);
+    mainGraphics.pop();
   }
   affect(particle) {
     if (this.type == "field") {
@@ -164,7 +174,13 @@ class Area {
       particle.v.y += noise((particle.p.y * this.sy) / 10) - 0.5;
     }
     if (this.type == "curl") {
-      particle.v.rotate(particle.polarity / pow(particle.r, 2));
+      particle.v.rotate(
+        (this.polarAmp * particle.polarity) / pow(particle.r, 2)
+      );
+    }
+    if (this.type == "square") {
+      particle.v.x += cos(particle.p.x / 10 + particle.p.y / 20);
+      particle.v.y += sin(particle.p.y / 10 + particle.p.x / 20);
     }
   }
   isParticleInArea(particle) {
@@ -234,10 +250,10 @@ let colors = {
 };
 let startPositions = {
   Center: [0.5, 0.5],
-  CornerLT: [0.2, 0.2],
-  CornerRT: [0.8, 0.2],
-  CornerLB: [0.2, 0.8],
-  CornerRB: [0.8, 0.8],
+  CornerLT: [0.3, 0.3],
+  CornerRT: [0.7, 0.3],
+  CornerLB: [0.3, 0.7],
+  CornerRB: [0.7, 0.7],
 };
 let particleCounts = {
   Less: {
@@ -256,37 +272,41 @@ let particleCounts = {
 let particleSizes = {
   XS: {
     weight: 2,
-    value: 25,
+    value: 30,
   },
   S: {
     weight: 5,
-    value: 40,
+    value: 45,
   },
   M: {
     weight: 5,
-    value: 55,
+    value: 60,
   },
   L: {
     weight: 4,
-    value: 70,
+    value: 75,
   },
   XL: {
     weight: 2,
-    value: 85,
+    value: 90,
   },
 };
 let areaTypes = {
   field: {
-    weight: 5,
+    weight: 8,
     value: "field",
   },
   curl: {
-    weight: 3,
+    weight: 2,
     value: "curl",
   },
   noise: {
     weight: 1,
     value: "noise",
+  },
+  square: {
+    weight: 1,
+    value: "square",
   },
 };
 let useStartPosition;
@@ -361,7 +381,10 @@ function div(x, y, w, h, z) {
       y,
       w,
       h,
-      type: getValueOfList(areaTypes, R.random_choice_weight(areaTypes)),
+      type: getValueOfList(
+        areaTypes,
+        R.random_choice_weight(mapListToWeightedKeys(areaTypes))
+      ),
       sx: R.random_num(0, 2),
       sy: R.random_num(0, 2),
       noiseX: R.random_num(0, 100),
@@ -452,7 +475,9 @@ function setup() {
   rotate(ang);
   translate(-width / 2, -height / 2);
 
-  div(0, 0, width, height, int(R.random_num(2, 5)));
+  div(0, 0, width, height, int(R.random_num(2, 4)));
+  features.AreaCount = areas.length;
+
   for (var i = 0; i < useParticleCount; i++) {
     let pColor = R.random_choice(useColorSet);
     particles.push(
@@ -463,7 +488,7 @@ function setup() {
         ),
         v: createVector(0, 1)
           .rotate(R.random_num(0, 2 * PI))
-          .mult(R.random_num(0, 10)),
+          .mult(R.random_num(3, 7)),
         color: pColor,
       })
     );
@@ -503,10 +528,16 @@ function draw() {
 
   image(mainGraphics, 0, 0);
 
-  // push();
-  // blendMode(MULTIPLY);
-  // image(canvasTexture, 0, 0, 1920 * 1.15, 1080 * 1.15);
-  // pop();
+  push();
+  blendMode(MULTIPLY);
+  image(canvasTexture, 0, 0, 1920 * 1.15, 1080 * 1.15);
+  pop();
+}
+
+function keyPressed() {
+  if (key == "s") {
+    save();
+  }
 }
 
 /*
