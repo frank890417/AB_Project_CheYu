@@ -72,6 +72,7 @@ class Particle {
       a: createVector(0, 0),
       r: R.random_num(0, useParticleSize) * R.random_num(0.1, 1) + 1,
       polarity: R.random_choice([-1, 1]),
+      canGenCount: 2,
       generation: 0,
       id: int(R.random_num(0, 1000)),
       vFriction: R.random_num(0.99, 1),
@@ -152,7 +153,7 @@ class Area {
     };
     Object.assign(def, args);
     Object.assign(this, def);
-    console.log(this);
+    // console.log(this);
   }
   draw() {
     mainGraphics.push();
@@ -297,15 +298,15 @@ let startPositions = {
 let particleCounts = {
   Less: {
     weight: 2,
-    value: 100,
+    value: 80,
   },
   Medium: {
     weight: 5,
-    value: 120,
+    value: 100,
   },
   More: {
     weight: 1,
-    value: 140,
+    value: 120,
   },
 };
 let particleSizes = {
@@ -591,13 +592,15 @@ function draw() {
           particle.area = area;
           particle.color = R.random_choice(area.colors);
           particle.v.rotate(R.random_num(-1, 1));
-          if (R.random_dec() < 0.1 && particle.generation < 5) {
+          if (R.random_dec() < 0.1 && particle.generation < 2 && particle.canGenCount >0) {
             let p = new Particle({
               p: particle.p.copy(),
               v: particle.v.copy(),
               a: particle.a.copy(),
               generation: particle.generation + 1,
             });
+            particle.canGenCount --
+            // console.log(p.generation)
             particles.push(p);
           }
         }
@@ -624,8 +627,9 @@ function draw() {
 
     for( var textId = 0; textId<tokenData.hash.length; textId++){
       // let xx = textId*15+15+mouseX, yy = mouseY + sin(frameCount/50+xx/50)*50 + noise(frameCount/50+xx/50)*100
-      let xx = textId*15+15+mouseX, yy = mouseY + sin(frameCount/50+xx/50)*50 
+      // let xx = textId*15+15+mouseX, yy = mouseY + sin(frameCount/50+xx/50)*50 
       // let xx = textId*15+15+mouseX, yy = mouseY
+      let xx = textId*15+30, yy = height-30
       // for(let xx=0;xx<width;xx+=20){
       //   for(let yy=0;yy<height;yy+=20){
 
