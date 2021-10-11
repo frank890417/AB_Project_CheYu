@@ -143,10 +143,11 @@ class Area {
       noiseXAmp: R.random_num(-5, 5),
       noiseYAmp: R.random_num(-5, 5),
       gravity: createVector(
-        R.random_num(-0.15, 0.15),
-        R.random_num(-0.15, 0.15)
+        R.random_num(-0.1, 0.1),
+        R.random_num(-0.1, 0.1)
       ),
       colors: useColorSet,
+      color: R.random_choice(useColorSet),
       id: int(R.random_num(0, 100000)),
     };
     Object.assign(def, args);
@@ -156,7 +157,7 @@ class Area {
   draw() {
     mainGraphics.push();
     mainGraphics.noStroke();
-    mainGraphics.fill(R.random_choice(this.colors));
+    mainGraphics.fill(this.color);
     mainGraphics.rect(this.x, this.y, this.w, this.h);
     //debug type text
     // mainGraphics.fill(255, 0, 0);
@@ -205,19 +206,26 @@ class AngArea extends Area{
   }
   draw(){
     let useR =(this.stR+this.edR)/2 
+    let sWeight = this.edR-this.stR
     mainGraphics.push()
     mainGraphics.strokeCap(SQUARE)
       mainGraphics.noFill()
-      mainGraphics.stroke(R.random_choice(this.colors));
+      mainGraphics.stroke(this.color);
       mainGraphics.translate(width/2,height/2)
-      mainGraphics.strokeWeight(this.edR-this.stR)
-      mainGraphics.arc(0,0,useR,useR,this.stAng,this.edAng,OPEN)
+
+      mainGraphics.strokeWeight(sWeight)
+      mainGraphics.arc(0,0,useR*2,useR*2,this.stAng,this.edAng,OPEN)
     mainGraphics.pop()
   }
   isParticleInArea(particle) { 
-    let pAng = atan2(particle.p.y- height/2,particle.p.x-width/2)
+    let transformAng = (ang)=>ang<0?ang+PI*2:ang
+    let pAng = transformAng(atan2(particle.p.y- height/2,particle.p.x-width/2) )
+     
+
     let pR = dist(particle.p.x,particle.p.y,width/2,height/2)
-    return pAng >= this.stAng && pAng <=this.edAng && pR> this.stR && pR< this.edR
+
+    return pAng>= this.stAng&& pAng <=this.edAng&& pR>= this.stR && pR<= this.edR
+ 
   }
 
 }
@@ -508,8 +516,9 @@ function divAng(stR, edR, stAng, edAng, d) {
 let particles = [];
 let ang;
 function setup() {
-  // pixelDensity(2);
+  pixelDensity(3);
   createCanvas(1200, 1200);
+  // createCanvas(windowWidth, windowHeight);
   mainGraphics = createGraphics(width, height);
   background(100);
 
@@ -546,7 +555,7 @@ function setup() {
     div(0, 0, width, height, int(R.random_num(2, 4)));
   }
   if (useDivisionType=="ang"){
-    divAng(0, width*2, 0, 360, int(R.random_num(2, 6)));
+    divAng(0, width, 0, 2*PI, int(R.random_num(2, 6)));
   }
   features.AreaCount = areas.length;
 
@@ -605,18 +614,52 @@ function draw() {
   image(canvasTexture, 0, 0, 1920 * 1.15, 1080 * 1.15);
   pop();
 
-  fill(0)
-  textSize(20)
   
-  textFont("Courier")
-  select('canvas').elt.style.letterSpacing = "5px";
-  text(tokenData.hash,30,height-30)
+  if (showHash ){
+    fill(0)
+    textSize(20)
+    textFont("Courier")
+    // select('canvas').elt.style.letterSpacing = "5px";
+    textAlign(RIGHT)
+
+    for( var textId = 0; textId<tokenData.hash.length; textId++){
+      // let xx = textId*15+15+mouseX, yy = mouseY + sin(frameCount/50+xx/50)*50 + noise(frameCount/50+xx/50)*100
+      let xx = textId*15+15+mouseX, yy = mouseY + sin(frameCount/50+xx/50)*50 
+      // let xx = textId*15+15+mouseX, yy = mouseY
+      // for(let xx=0;xx<width;xx+=20){
+      //   for(let yy=0;yy<height;yy+=20){
+
+      areas.forEach(area=>{
+        if (area.isParticleInArea( {
+          p: createVector(xx,yy)
+        } )){
+          let ar = color(area.color)
+          let b = 0.2126*ar._getRed() + 0.7152*ar._getGreen() + 0.0722*ar._getBlue()
+          if (b>255/2){
+            fill(0)
+          }else{
+            fill(255)
+          }
+        }
+      })
+      noStroke()
+
+      // ellipse(xx,yy,4,4)
+        // }
+      // }
+      
+      text(tokenData.hash[textId],xx,yy)
+    }
+  }
 
 }
-
+let showHash =true
 function keyPressed() {
   if (key == "s") {
     save();
+  }
+  if (key ==" "){
+    showHash  = !showHash 
   }
 }
 
