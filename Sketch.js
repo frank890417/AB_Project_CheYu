@@ -179,8 +179,8 @@ class Area {
       );
     }
     if (this.type == "square") {
-      particle.v.x += cos(particle.p.x / 10 + particle.p.y / 20);
-      particle.v.y += sin(particle.p.y / 10 + particle.p.x / 20);
+      particle.v.x += cos(particle.p.x / 10 + particle.p.y / 20) / 2;
+      particle.v.y += sin(particle.p.y / 10 + particle.p.x / 20) / 2;
     }
   }
   isParticleInArea(particle) {
