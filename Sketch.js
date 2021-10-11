@@ -116,28 +116,56 @@ class Particle {
 let overAllTexture;
 let maxParticleR = 30;
 let canvasTexture;
-let particleCount = 100;
+let mapColorsToArr = (str) => str.split("-").map((a) => "#" + a);
 let colors = {
-  Paper: "222-666-999-aaa-ccc-eee-fff-080808".split("-").map((a) => "#" + a),
-  Kimono: "fff-f24-fae8eb-f6caca-e4c2c6-cd9fcc-0a014f"
-    .split("-")
-    .map((a) => "#" + a),
-  Sea: "e63946-f1faee-a8dadc-457b9d-1d3557".split("-").map((a) => "#" + a),
-  Confetti: "201e1f-ff4000-faaa8d-feefdd-50b2c0".split("-").map((a) => "#" + a),
-  Vine: "fff-222-545454-69747c-6baa75-84dd63-cbff4d"
-    .split("-")
-    .map((a) => "#" + a),
-  Festival: "12355b-420039-d72638-ffffff-ff570a".split("-").map((a) => "#" + a),
-  Lolipop: "ff499e-d264b6-a480cf-779be7-49b6ff-fff-000"
-    .split("-")
-    .map((a) => "#" + a),
-  Eastern: "333745-e63462-fe5f55-c7efcf-eef5db".split("-").map((a) => "#" + a),
-  Beans: "fb6107-f3de2c-7cb518-5c8001-fbb02d-fff-111"
-    .split("-")
-    .map((a) => "#" + a),
-  MonoChrome: "000-fff-333".split("-").map((a) => "#" + a),
-  Mint: "000-fff-333-00ffbb".split("-").map((a) => "#" + a),
-  Taxi: "000-fff-333-fff719".split("-").map((a) => "#" + a),
+  Paper: {
+    weight: 100,
+    value: mapColorsToArr("222-666-999-aaa-ccc-eee-fff-080808"),
+  },
+  Kimono: {
+    weight: 100,
+    value: mapColorsToArr("fff-f24-fae8eb-f6caca-e4c2c6-cd9fcc-0a014f"),
+  },
+  Sea: {
+    weight: 100,
+    value: mapColorsToArr("e63946-f1faee-a8dadc-457b9d-1d3557"),
+  },
+  Confetti: {
+    weight: 100,
+    value: mapColorsToArr("201e1f-ff4000-faaa8d-feefdd-50b2c0"),
+  },
+  Vine: {
+    weight: 100,
+    value: mapColorsToArr("fff-222-545454-69747c-6baa75-84dd63-cbff4d"),
+  },
+  Festival: {
+    weight: 100,
+    value: mapColorsToArr("12355b-420039-d72638-ffffff-ff570a"),
+  },
+  Lolipop: {
+    weight: 100,
+    value: mapColorsToArr("ff499e-d264b6-a480cf-779be7-49b6ff-fff-000"),
+  },
+  Eastern: {
+    weight: 100,
+    value: mapColorsToArr("333745-e63462-fe5f55-c7efcf-eef5db"),
+  },
+  Beans: {
+    weight: 100,
+    value: mapColorsToArr("fb6107-f3de2c-7cb518-5c8001-fbb02d-fff-111"),
+  },
+  MonoChrome: {
+    weight: 100,
+    value: mapColorsToArr("000-fff-333"),
+  },
+  Mint: {
+    weight: 100,
+    value: mapColorsToArr("000-fff-333-00ffbb"),
+  },
+  Taxi: {
+    weight: 100,
+    value: mapColorsToArr("000-fff-333-fff719"),
+  },
 };
 let startPositions = {
   Center: [0.5, 0.5],
@@ -146,24 +174,39 @@ let startPositions = {
   CornerLB: [0.2, 0.8],
   CornerRB: [0.8, 0.8],
 };
-let particleCounts = {};
+let particleCounts = {
+  Less: {
+    weight: 2,
+    value: 50,
+  },
+  Medium: {
+    weight: 5,
+    value: 100,
+  },
+  More: {
+    weight: 1,
+    value: 150,
+  },
+};
 let useStartPosition;
+let useParticleCount;
 let useColorSet;
 let mainGraphics;
 let areas = [];
 
 //---------
 let mapListToWeightedKeys = (list) => {
-  return Object.keys(list)
-    .filter((k) => k)
-    .reduce((obj, key) => {
-      obj[key] = 1;
+  return Object.entries(list)
+    .filter((pair) => pair[0])
+    .reduce((obj, arr) => {
+      obj[arr[0]] = arr[1]?.weight || 1;
       return obj;
     }, {});
 };
 let allFeatureList = {
   Color: mapListToWeightedKeys(colors),
-  startPosition: mapListToWeightedKeys(startPositions),
+  StartPosition: mapListToWeightedKeys(startPositions),
+  ParticleCount: mapListToWeightedKeys(particleCounts),
   // RailType: {
   //   Sine: 20,
   //   Triangle: 5,
@@ -174,11 +217,19 @@ let allFeatureList = {
 
 //------------------------------
 
+function getValueOfList(list, key) {
+  return list[key]?.value || list[key];
+}
+
 function renderFeatures() {
   features.Color = R.random_choice_weight(allFeatureList.Color);
-  useColorSet = colors[features.Color];
-  features.startPosition = R.random_choice_weight(allFeatureList.startPosition);
-  useStartPosition = startPositions[features.startPosition];
+  useColorSet = getValueOfList(colors, features.Color);
+
+  features.StartPosition = R.random_choice_weight(allFeatureList.StartPosition);
+  useStartPosition = getValueOfList(startPositions, features.StartPosition);
+
+  features.ParticleCount = R.random_choice_weight(allFeatureList.ParticleCount);
+  useParticleCount = getValueOfList(particleCounts, features.ParticleCount);
 }
 
 function preload() {
@@ -260,7 +311,7 @@ function setup() {
   translate(-width / 2, -height / 2);
 
   div(0, 0, width, height, int(R.random_num(2, 5)));
-  for (var i = 0; i < particleCount; i++) {
+  for (var i = 0; i < useParticleCount; i++) {
     let pColor = R.random_choice(useColorSet);
     particles.push(
       new Particle({
