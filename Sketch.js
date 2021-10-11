@@ -71,6 +71,7 @@ class Particle {
       v: createVector(0, 0),
       a: createVector(0, 0),
       r: R.random_num(0, useParticleSize) * R.random_num(0.1, 1) + 1,
+      polarity: R.random_choice([-1, 1]),
       generation: 0,
       id: int(R.random_num(0, 1000)),
       vFriction: R.random_num(0.99, 1),
@@ -103,10 +104,9 @@ class Particle {
       this.color = R.random_choice(this.area.colors);
     }
     if (this.area) {
+      this.area.affect(this);
       // this.p.x+=cos(this.p.x*this.area.sx)/5
       // this.p.y+=sin(this.p.y*this.area.sy)/5
-      this.v.x += cos((this.p.x * this.area.sx) / 10) / 10;
-      this.v.y += sin((this.p.y * this.area.sy) / 10) / 10;
 
       // this.p.x +=noise(this.p.x*this.area.noiseX)*this.area.noiseXAmp
       // this.p.y +=noise(this.p.y*this.area.noiseY)*this.area.noiseYAmp
@@ -121,6 +121,61 @@ class Particle {
 
     this.v.add(this.a);
     this.life--;
+  }
+}
+
+class Area {
+  constructor(args) {
+    let def = {
+      x: 0,
+      y: 0,
+      w: 0,
+      h: 0,
+      type: getValueOfList(areaTypes, R.random_choice_weight(areaTypes)),
+      sx: R.random_num(0, 2),
+      sy: R.random_num(0, 2),
+      noiseX: R.random_num(0, 100),
+      noiseY: R.random_num(0, 1000),
+      noiseXAmp: R.random_num(-5, 5),
+      noiseYAmp: R.random_num(-5, 5),
+      gravity: createVector(
+        R.random_num(-0.15, 0.15),
+        R.random_num(-0.15, 0.15)
+      ),
+      colors: useColorSet,
+      id: int(R.random_num(0, 100000)),
+    };
+    Object.assign(def, args);
+    Object.assign(this, def);
+    console.log(this);
+  }
+  draw() {
+    mainGraphics.noStroke();
+    mainGraphics.fill(R.random_choice(this.colors));
+    mainGraphics.rect(this.x, this.y, this.w, this.h);
+  }
+  affect(particle) {
+    if (this.type == "field") {
+      particle.v.x += cos((particle.p.x * this.sx) / 10) / 10;
+      particle.v.y += sin((particle.p.y * this.sy) / 10) / 10;
+    }
+    if (this.type == "noise") {
+      particle.v.x += noise((particle.p.x * this.sx) / 10) - 0.5;
+      particle.v.y += noise((particle.p.y * this.sy) / 10) - 0.5;
+    }
+    if (this.type == "curl") {
+      particle.v.rotate(particle.polarity / pow(particle.r, 2));
+    }
+  }
+  isParticleInArea(particle) {
+    let rectCheckFunc = (area, p) =>
+      p.p.x > area.x &&
+      p.p.x < area.x + area.w &&
+      p.p.y > area.y &&
+      p.p.y < area.y + area.h;
+    let checkFunc = this.checkFunc || rectCheckFunc;
+
+    return checkFunc(this, particle);
   }
 }
 
@@ -220,6 +275,20 @@ let particleSizes = {
     value: 85,
   },
 };
+let areaTypes = {
+  field: {
+    weight: 5,
+    value: "field",
+  },
+  curl: {
+    weight: 3,
+    value: "curl",
+  },
+  noise: {
+    weight: 1,
+    value: "noise",
+  },
+};
 let useStartPosition;
 let useParticleCount;
 let useColorSet;
@@ -287,30 +356,31 @@ function div(x, y, w, h, z) {
       div(x, y + hh, w, h - hh, z - 1);
     }
   } else {
-    let newArea = {
+    let newArea = new Area({
       x,
       y,
       w,
       h,
+      type: getValueOfList(areaTypes, R.random_choice_weight(areaTypes)),
       sx: R.random_num(0, 2),
       sy: R.random_num(0, 2),
       noiseX: R.random_num(0, 100),
       noiseY: R.random_num(0, 1000),
       noiseXAmp: R.random_num(-5, 5),
       noiseYAmp: R.random_num(-5, 5),
-      gravity: createVector(R.random_num(-0.1, 0.1), R.random_num(-0.1, 0.1)),
+      gravity: createVector(
+        R.random_num(-0.15, 0.15),
+        R.random_num(-0.15, 0.15)
+      ),
       colors: useColorSet,
-      id: int(R.random_num(0, 100000)),
-    };
-    mainGraphics.noStroke();
+    });
+    newArea.draw();
     areas.push(newArea);
-    mainGraphics.fill(R.random_choice(newArea.colors));
-    mainGraphics.rect(x, y, w, h);
   }
 }
 
 function divAng(stR, edR, stAng, edAng, d, colors) {
-  if (random() < 0.2) {
+  if (random() < 0.15) {
     colors = random([colors1, colors2]);
   }
   push();
@@ -393,7 +463,7 @@ function setup() {
         ),
         v: createVector(0, 1)
           .rotate(R.random_num(0, 2 * PI))
-          .mult(5),
+          .mult(R.random_num(0, 10)),
         color: pColor,
       })
     );
@@ -404,32 +474,13 @@ function setup() {
   mainGraphics.translate(-width / 2, -height / 2);
 }
 
-let checkParticleInArea = (area, p) => {
-  let rectCheckFunc = (area, p) =>
-    p.p.x > area.x &&
-    p.p.x < area.x + area.w &&
-    p.p.y > area.y &&
-    p.p.y < area.y + area.h;
-  let checkFunc = area.checkFunc || rectCheckFunc;
-
-  return checkFunc(area, p);
-};
-
 function draw() {
   mainGraphics.noStroke();
-
-  // 	if (mouseIsPressed){
-  // 		particles.push(new Particle({
-  // 			p: createVector(mouseX,mouseY),
-  // 			v: p5.Vector.random2D().mult(5),
-  // 			color: random(colors)
-  // 		}))
-  // 	}
 
   particles.forEach((particle) => {
     particle.update();
     areas.forEach((area) => {
-      if (checkParticleInArea(area, particle)) {
+      if (area.isParticleInArea(particle)) {
         if (particle.area !== area) {
           particle.area = area;
           particle.color = R.random_choice(area.colors);
@@ -452,10 +503,10 @@ function draw() {
 
   image(mainGraphics, 0, 0);
 
-  push();
-  blendMode(MULTIPLY);
-  image(canvasTexture, 0, 0, 1920 * 1.15, 1080 * 1.15);
-  pop();
+  // push();
+  // blendMode(MULTIPLY);
+  // image(canvasTexture, 0, 0, 1920 * 1.15, 1080 * 1.15);
+  // pop();
 }
 
 /*
