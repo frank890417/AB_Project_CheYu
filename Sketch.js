@@ -168,9 +168,9 @@ function preload() {
 }
 
 function div(x, y, w, h, z) {
-  if (R.random_num() < 0.5 + z / 8 && z > 0) {
+  if (R.random_dec() < 0.5 + z / 8 && z > 0) {
     let ratio = R.random_num(0.2, 0.8);
-    if (R.random_num() < 0.3) {
+    if (R.random_dec() < 0.3) {
       let ww = w * ratio;
       div(x, y, ww, h, z - 1);
       div(x + ww, y, w - ww, h, z - 1);
@@ -197,7 +197,7 @@ function div(x, y, w, h, z) {
     };
     mainGraphics.noStroke();
     areas.push(newArea);
-    mainGraphics.fill(R.random_num(newArea.colors));
+    mainGraphics.fill(R.random_choice(newArea.colors));
     mainGraphics.rect(x, y, w, h);
   }
 }
