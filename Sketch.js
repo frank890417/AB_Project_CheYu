@@ -10,6 +10,9 @@ class Random {
   constructor(seed) {
     this.seed = seed;
   }
+  random() {
+    return this.random_dec();
+  }
   random_dec() {
     /* Algorithm "xor" from p. 4 of Marsaglia, "Xorshift RNGs" */
     this.seed ^= this.seed << 13;
@@ -18,9 +21,17 @@ class Random {
     return ((this.seed < 0 ? ~this.seed + 1 : this.seed) % 1000) / 1000;
   }
   random_num(a, b) {
+    if (b === undefined) {
+      b = a;
+      a = 0;
+    }
     return a + (b - a) * this.random_dec();
   }
   random_int(a, b) {
+    if (b === undefined) {
+      b = a;
+      a = 0;
+    }
     return Math.floor(this.random_num(a, b + 1));
   }
   random_bool(p) {
@@ -59,7 +70,7 @@ class Particle {
       p: createVector(0, 0),
       v: createVector(0, 0),
       a: createVector(0, 0),
-      r: R.random_num(0, maxParticleR) * R.random_num(0.1, 1) + 1,
+      r: R.random_num(0, useParticleSize) * R.random_num(0.1, 1) + 1,
       generation: 0,
       id: int(R.random_num(0, 1000)),
       vFriction: R.random_num(0.99, 1),
@@ -114,7 +125,6 @@ class Particle {
 }
 
 let overAllTexture;
-let maxParticleR = 30;
 let canvasTexture;
 let mapColorsToArr = (str) => str.split("-").map((a) => "#" + a);
 let colors = {
@@ -177,20 +187,39 @@ let startPositions = {
 let particleCounts = {
   Less: {
     weight: 2,
-    value: 50,
+    value: 100,
   },
   Medium: {
     weight: 5,
-    value: 100,
+    value: 120,
   },
   More: {
     weight: 1,
-    value: 150,
+    value: 140,
+  },
+};
+let particleSizes = {
+  XS: {
+    weight: 2,
+    value: 25,
+  },
+  S: {
+    weight: 5,
+    value: 40,
+  },
+  M: {
+    weight: 5,
+    value: 55,
+  },
+  L: {
+    weight: 4,
+    value: 70,
   },
 };
 let useStartPosition;
 let useParticleCount;
 let useColorSet;
+let useParticleSize;
 let mainGraphics;
 let areas = [];
 
@@ -207,6 +236,7 @@ let allFeatureList = {
   Color: mapListToWeightedKeys(colors),
   StartPosition: mapListToWeightedKeys(startPositions),
   ParticleCount: mapListToWeightedKeys(particleCounts),
+  ParticleSize: mapListToWeightedKeys(particleSizes),
   // RailType: {
   //   Sine: 20,
   //   Triangle: 5,
@@ -230,6 +260,9 @@ function renderFeatures() {
 
   features.ParticleCount = R.random_choice_weight(allFeatureList.ParticleCount);
   useParticleCount = getValueOfList(particleCounts, features.ParticleCount);
+
+  features.ParticleSize = R.random_choice_weight(allFeatureList.ParticleSize);
+  useParticleSize = getValueOfList(particleSizes, features.ParticleSize);
 }
 
 function preload() {
@@ -271,11 +304,46 @@ function div(x, y, w, h, z) {
     mainGraphics.rect(x, y, w, h);
   }
 }
+
+function divAng(stR, edR, stAng, edAng, d, colors) {
+  if (random() < 0.2) {
+    colors = random([colors1, colors2]);
+  }
+  push();
+  if (random() < 0.3) {
+    d -= 1;
+    // return
+  }
+  let ratio = random(0.3, 0.7);
+  if (d > 0) {
+    if (random() < 0.35) {
+      let splitNum = random([2, 2, 2, 2, 2, 3]);
+      for (var o = 1; o <= splitNum; o++) {
+        divAng(
+          stR,
+          edR,
+          stAng + ((o - 1) * (edAng - stAng)) / splitNum,
+          stAng + (o * (edAng - stAng)) / splitNum,
+          d - 1
+        );
+      }
+      // divAng(stR,edR,
+      // 			 stAng,
+      // 			 stAng+ratio*(edAng-stAng),d-1)
+      // divAng(stR,edR,
+      // 			 stAng+ratio*(edAng-stAng),
+      // 			 edAng,d-1)
+    } else {
+      divAng(stR, stR + ratio * (edR - stR), stAng, edAng, d - 1);
+      divAng(stR + ratio * (edR - stR), edR, stAng, edAng, d - 1);
+    }
+  }
+  pop();
+}
+
 let particles = [];
 let ang;
 function setup() {
-  maxParticleR = R.random_num(25, 80);
-
   pixelDensity(2);
   createCanvas(1200, 1200);
   mainGraphics = createGraphics(width, height);
@@ -333,12 +401,14 @@ function setup() {
 }
 
 let checkParticleInArea = (area, p) => {
-  return (
+  let rectCheckFunc = (area, p) =>
     p.p.x > area.x &&
     p.p.x < area.x + area.w &&
     p.p.y > area.y &&
-    p.p.y < area.y + area.h
-  );
+    p.p.y < area.y + area.h;
+  let checkFunc = area.checkFunc || rectCheckFunc;
+
+  return checkFunc(area, p);
 };
 
 function draw() {
@@ -378,10 +448,10 @@ function draw() {
 
   image(mainGraphics, 0, 0);
 
-  push();
-  blendMode(MULTIPLY);
-  image(canvasTexture, 0, 0, 1920 * 1.15, 1080 * 1.15);
-  pop();
+  // push();
+  // blendMode(MULTIPLY);
+  // image(canvasTexture, 0, 0, 1920 * 1.15, 1080 * 1.15);
+  // pop();
 }
 
 /*
