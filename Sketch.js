@@ -60,13 +60,14 @@ class Particle {
       v: createVector(0, 0),
       a: createVector(0, 0),
       r: R.random_num(0, maxParticleR) * R.random_num(0.1, 1) + 1,
+      generation: 0,
       id: int(R.random_num(0, 1000)),
       vFriction: R.random_num(0.99, 1),
       rFactor: R.random_num(0.99, 0.9995),
       area: null,
       hasFruit: R.random_num() < 0.5,
       color: "white",
-      life: R.random_num(0, 2000),
+      life: 500,
     };
     Object.assign(def, args);
     Object.assign(this, def);
@@ -108,8 +109,10 @@ class Particle {
     this.p.add(this.v);
 
     this.v.add(this.a);
+    this.life--;
   }
 }
+
 let overAllTexture;
 let maxParticleR = 30;
 let canvasTexture;
@@ -136,17 +139,31 @@ let colors = {
   Mint: "000-fff-333-00ffbb".split("-").map((a) => "#" + a),
   Taxi: "000-fff-333-fff719".split("-").map((a) => "#" + a),
 };
+let startPositions = {
+  Center: [0.5, 0.5],
+  CornerLT: [0.2, 0.2],
+  CornerRT: [0.8, 0.2],
+  CornerLB: [0.2, 0.8],
+  CornerRB: [0.8, 0.8],
+};
+let particleCounts = {};
+let useStartPosition;
 let useColorSet;
 let mainGraphics;
 let areas = [];
 
 //---------
-
+let mapListToWeightedKeys = (list) => {
+  return Object.keys(list)
+    .filter((k) => k)
+    .reduce((obj, key) => {
+      obj[key] = 1;
+      return obj;
+    }, {});
+};
 let allFeatureList = {
-  Color: Object.keys(colors).reduce((obj, key) => {
-    obj[key] = 1;
-    return obj;
-  }, {}),
+  Color: mapListToWeightedKeys(colors),
+  startPosition: mapListToWeightedKeys(startPositions),
   // RailType: {
   //   Sine: 20,
   //   Triangle: 5,
@@ -160,6 +177,8 @@ let allFeatureList = {
 function renderFeatures() {
   features.Color = R.random_choice_weight(allFeatureList.Color);
   useColorSet = colors[features.Color];
+  features.startPosition = R.random_choice_weight(allFeatureList.startPosition);
+  useStartPosition = startPositions[features.startPosition];
 }
 
 function preload() {
@@ -242,13 +261,17 @@ function setup() {
 
   div(0, 0, width, height, int(R.random_num(2, 5)));
   for (var i = 0; i < particleCount; i++) {
+    let pColor = R.random_choice(useColorSet);
     particles.push(
       new Particle({
-        p: createVector(width / 2, height / 2),
+        p: createVector(
+          useStartPosition[0] * width,
+          useStartPosition[1] * height
+        ),
         v: createVector(0, 1)
           .rotate(R.random_num(0, 2 * PI))
           .mult(5),
-        color: R.random_choice(colors),
+        color: pColor,
       })
     );
   }
@@ -286,11 +309,12 @@ function draw() {
           particle.area = area;
           particle.color = R.random_choice(area.colors);
           particle.v.rotate(R.random_num(-1, 1));
-          if (R.random_dec() < 0.1) {
+          if (R.random_dec() < 0.1 && particle.generation < 5) {
             let p = new Particle({
               p: particle.p.copy(),
               v: particle.v.copy(),
               a: particle.a.copy(),
+              generation: particle.generation + 1,
             });
             particles.push(p);
           }
@@ -299,6 +323,7 @@ function draw() {
     });
     particle.draw();
   });
+  particles = particles.filter((p) => p.life > 0);
 
   image(mainGraphics, 0, 0);
 
