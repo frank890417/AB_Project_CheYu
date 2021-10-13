@@ -25,9 +25,8 @@
           .replace("T", "_");
       }
       let tokenData = {
-
-        hash: "0xB9771Ef800f2B8583230451cCE7d547D7c659265",
-        // hash: "0x" + keccak256(get_timestamp()),
+        // hash: "0xB9771Ef800f2B8583230451cCE7d547D7c659265",
+        hash: "0x" + keccak256(get_timestamp()),
         // hash: "0x" + keccak256("1138"),
         // hash: "0x8f2e1aaaeb17c59b16e18dc68d2cf18e78e6e7dcefe198d73cad2820d8544647",
         // hash: "0x4a99dbd07b5e12b5a5f9291a46249c70286fbc0f3b713872f87211f0f2772756",
@@ -36,7 +35,7 @@
       function download() {
         save(`${tokenData.hash}_${get_timestamp()}.jpg`);
       }
-    </script>  
+    </script>
     <script src="Sketch.js" type="text/javascript"></script>
     <style type="text/css">
       html,
