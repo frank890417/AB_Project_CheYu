@@ -709,7 +709,7 @@ function draw() {
   }
 
   // Draw Hash
-  if (showHash || mouseIsPressed) {
+  if (showHash) {
     fill(0);
     textSize(20);
     textFont("Courier");
