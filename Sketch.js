@@ -314,7 +314,7 @@ let colors = {
   },
   Earth: {
     weight: 100,
-    value: mapColorsToArr("0a0908-22333b-f2f4f3-a9927d-5e503f-efc734-9cc968"),
+    value: mapColorsToArr("0a0908-142228-f2f4f3-a9927d-5e503f-efc734-e0ba67"),
   },
 };
 let startPositions = {
@@ -634,7 +634,7 @@ function setup() {
     div(0, 0, width, height, int(R.random_num(2, 4)));
   }
   if (useDivisionType == "Ang") {
-    divAng(0, width, 0, 2 * PI, int(R.random_num(2, 6)));
+    divAng(0, width, 0, 2 * PI, int(R.random_num(2, 5)));
   }
   features.AreaCount = areas.length;
 
