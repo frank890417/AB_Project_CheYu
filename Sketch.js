@@ -148,6 +148,8 @@ class Area {
       noiseY: R.random_num(0, 1000),
       noiseXAmp: R.random_num(-5, 5),
       noiseYAmp: R.random_num(-5, 5),
+      parallelAngle: R.random_num(0, 2 * PI),
+      parallelAmp: R.random_num(0.0001, 0.002),
       gravity: createVector(R.random_num(-0.1, 0.1), R.random_num(-0.1, 0.1)),
       colors: useColorSet,
       color: R.random_choice(useColorSet),
@@ -200,6 +202,15 @@ class Area {
         cos(int(particle.p.x / 40) * 2) * 2 * particle.affectFactor;
       particle.p.y +=
         cos(int(particle.p.y / 40) * 2) * 2 * particle.affectFactor;
+    }
+    if (this.type == "parallel") {
+      if (particle.v.heading() != this.parallelAngle) {
+        particle.v.rotate(
+          (this.parallelAngle - particle.v.heading()) * this.parallelAmp
+        );
+        // console.log(particle.v);
+      }
+      // particle.v.setHeading(this.parallelAngle);
     }
   }
   isParticleInArea(particle) {
@@ -301,6 +312,10 @@ let colors = {
     weight: 100,
     value: mapColorsToArr("000-fff-333-fff719"),
   },
+  Earth: {
+    weight: 100,
+    value: mapColorsToArr("0a0908-22333b-f2f4f3-a9927d-5e503f-efc734-9cc968"),
+  },
 };
 let startPositions = {
   Center: {
@@ -350,27 +365,31 @@ let particleSizes = {
 };
 let areaTypes = {
   field: {
-    weight: 20,
+    weight: 30,
     value: "field",
   },
   curl: {
-    weight: 3,
+    weight: 6,
     value: "curl",
   },
   noise: {
-    weight: 2,
+    weight: 4,
     value: "noise",
   },
   square: {
-    weight: 2,
+    weight: 4,
     value: "square",
   },
   step: {
-    weight: 5,
+    weight: 10,
     value: "step",
   },
+  parallel: {
+    weight: 2,
+    value: "parallel",
+  },
   none: {
-    weight: 1,
+    weight: 2,
     value: "none",
   },
 };
@@ -559,7 +578,7 @@ function divAng(stR, edR, stAng, edAng, d) {
 let particles = [];
 let ang;
 function setup() {
-  pixelDensity(3);
+  pixelDensity(2);
   createCanvas(1200, 1200);
 
   // createCanvas(windowWidth, windowHeight);
