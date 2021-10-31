@@ -103,6 +103,15 @@ class Particle {
       mainGraphics.stroke(this.color);
       mainGraphics.ellipse(0, 0, this.r * ss, this.r * ss);
     }
+    if (useSpecialType == "Spray") {
+      for (var i = 0; i < 4; i++) {
+        mainGraphics.fill(this.color);
+        let dd = R.random_num(40) * R.random();
+        let rr = (R.random_num(30) * R.random()) / (sqrt(dd) + 2);
+        let aa = R.random_num(0, 2 * PI);
+        mainGraphics.ellipse(dd * cos(aa), dd * sin(aa), rr, rr);
+      }
+    }
     mainGraphics.pop();
   }
   update() {
@@ -163,6 +172,15 @@ class Area {
     mainGraphics.push();
     mainGraphics.noStroke();
     mainGraphics.fill(this.color);
+    if (useSpecialType == "Wireframe") {
+      mainGraphics.noFill();
+      mainGraphics.strokeWeight(5);
+      mainGraphics.stroke(this.color);
+    }
+    if (useSpecialType == "Kinetic") {
+      mainGraphics.translate(R.random_num(-8, 8), R.random_num(-8, 8));
+      mainGraphics.rotate(R.random_num(-0.03, 0.03));
+    }
     mainGraphics.rect(this.x, this.y, this.w, this.h);
     //debug type text
     // mainGraphics.fill(255, 0, 0);
@@ -237,10 +255,27 @@ class AngArea extends Area {
     mainGraphics.noFill();
     mainGraphics.stroke(this.color);
     mainGraphics.translate(width / 2, height / 2);
-
     mainGraphics.strokeWeight(sWeight);
     mainGraphics.arc(0, 0, useR * 2, useR * 2, this.stAng, this.edAng, OPEN);
     mainGraphics.pop();
+    if (useSpecialType == "Kinetic") {
+      mainGraphics.translate(R.random_num(-8, 8), R.random_num(-8, 8));
+      mainGraphics.rotate(R.random_num(-0.03, 0.03));
+    }
+
+    if (useSpecialType == "Wireframe") {
+      console.log(useSpecialType);
+      let useR = (this.stR + this.edR) / 2;
+      let sWeight = this.edR - this.stR - 20;
+      mainGraphics.push();
+      mainGraphics.strokeCap(SQUARE);
+      mainGraphics.noFill();
+      mainGraphics.stroke(0);
+      mainGraphics.translate(width / 2, height / 2);
+      mainGraphics.strokeWeight(sWeight);
+      mainGraphics.arc(0, 0, useR * 2, useR * 2, this.stAng, this.edAng, OPEN);
+      mainGraphics.pop();
+    }
   }
   isParticleInArea(particle) {
     let transformAng = (ang) => (ang < 0 ? ang + PI * 2 : ang);
@@ -319,13 +354,31 @@ let colors = {
 };
 let startPositions = {
   Center: {
-    weight: 10,
+    weight: 15,
     value: [0.5, 0.5],
   },
-  CornerLT: [0.3, 0.3],
-  CornerRT: [0.7, 0.3],
-  CornerLB: [0.3, 0.7],
-  CornerRB: [0.7, 0.7],
+  CornerLT: [0.35, 0.35],
+  CornerRT: [0.65, 0.35],
+  CornerLB: [0.35, 0.65],
+  CornerRB: [0.65, 0.65],
+};
+let specialTypes = {
+  None: {
+    weight: 10,
+    value: "None",
+  },
+  Wireframe: {
+    weight: 2,
+    value: "Wireframe",
+  },
+  // Kinetic: {
+  //   weight: 100,
+  //   value: "Kinetic",
+  // },
+  Spray: {
+    weight: 1,
+    value: "Spray",
+  },
 };
 let particleCounts = {
   Less: {
@@ -348,19 +401,19 @@ let particleSizes = {
   // },
   S: {
     weight: 5,
-    value: 45,
+    value: 50,
   },
   M: {
     weight: 5,
-    value: 60,
+    value: 65,
   },
   L: {
     weight: 4,
-    value: 75,
+    value: 80,
   },
   XL: {
     weight: 2,
-    value: 90,
+    value: 95,
   },
 };
 let areaTypes = {
@@ -399,25 +452,29 @@ let emitTypes = {
     value: "Even",
   },
   random: {
-    weight: 10,
+    weight: 15,
     value: "Random",
   },
   linearHorizontal: {
-    weight: 1,
+    weight: 3,
     value: "LinearHorzontal",
   },
   linearVertical: {
-    weight: 1,
+    weight: 3,
     value: "LinearVertical",
+  },
+  linearSlope: {
+    weight: 2,
+    value: "LinearSlope",
   },
 };
 let divisionTypes = {
   rect: {
-    weight: 10,
+    weight: 15,
     value: "Rect",
   },
   ang: {
-    weight: 10,
+    weight: 5,
     value: "Ang",
   },
 };
@@ -427,6 +484,7 @@ let useColorSet;
 let useParticleSize;
 let useDivisionType;
 let useEmitType;
+let useSpecialType;
 let showCanvasTexture = true;
 let mainGraphics;
 let areas = [];
@@ -447,6 +505,7 @@ let allFeatureList = {
   ParticleSize: mapListToWeightedKeys(particleSizes),
   DivisionType: mapListToWeightedKeys(divisionTypes),
   EmitType: mapListToWeightedKeys(emitTypes),
+  SpecialType: mapListToWeightedKeys(specialTypes),
   // RailType: {
   //   Sine: 20,
   //   Triangle: 5,
@@ -479,6 +538,9 @@ function renderFeatures() {
 
   features.EmitType = R.random_choice_weight(allFeatureList.EmitType);
   useEmitType = getValueOfList(emitTypes, features.EmitType);
+
+  features.SpecialType = R.random_choice_weight(allFeatureList.SpecialType);
+  useSpecialType = getValueOfList(specialTypes, features.SpecialType);
 }
 
 function preload() {
@@ -578,14 +640,14 @@ function divAng(stR, edR, stAng, edAng, d) {
 let particles = [];
 let ang;
 function setup() {
-  pixelDensity(2);
+  pixelDensity(1);
   createCanvas(1200, 1200);
 
   // createCanvas(windowWidth, windowHeight);
   mainGraphics = createGraphics(width, height);
   fullCanvasTexture = createGraphics(width, height);
 
-  let textureGridSize = 150;
+  let textureGridSize = 120;
 
   for (let i = 0; i <= width; i += textureGridSize) {
     for (let o = 0; o <= height; o += textureGridSize) {
@@ -645,6 +707,7 @@ function setup() {
       useStartPosition[0] * width,
       useStartPosition[1] * height
     );
+    let useR = R.random_num(0, useParticleSize) * R.random_num(0.05, 1) + 1;
     if (useEmitType == "Random") {
       useEmitVelocity = createVector(0, 1)
         .rotate(R.random_num(0, 2 * PI))
@@ -653,6 +716,7 @@ function setup() {
       useEmitVelocity = createVector(0, 1)
         .rotate(map(i, 0, useParticleCount, 0, PI))
         .mult(R.random_num(2, 6));
+      useR = sin(i / 4) * 10 + 12;
     } else if (useEmitType == "LinearHorzontal") {
       useEmitVelocity = createVector(0, 1)
         .rotate(sin((i / useParticleCount) * 2 * PI))
@@ -669,11 +733,20 @@ function setup() {
         width / 2,
         map(i, 0, useParticleCount, 0, height)
       );
+    } else if (useEmitType == "LinearSlope") {
+      useEmitVelocity = createVector(1, 0)
+        .rotate(sin((i / useParticleCount) * 2 * PI))
+        .mult(R.random_num(2, 6));
+      useEmitPosition = createVector(
+        map(i, 0, useParticleCount, 0, width),
+        map(i, 0, useParticleCount, 0, height)
+      );
     }
     particles.push(
       new Particle({
         p: useEmitPosition,
         v: useEmitVelocity,
+        r: useR,
         color: pColor,
       })
     );
@@ -775,7 +848,7 @@ function draw() {
 let showHash = false;
 function keyPressed() {
   if (key == "s") {
-    save();
+    save("CYW_Electriz - " + tokenData.hash + ".png");
   }
   if (key == "t") {
     showCanvasTexture = !showCanvasTexture;
