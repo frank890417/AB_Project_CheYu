@@ -1,4 +1,6 @@
 // console.log(tokenData);
+//minifier
+
 let projectNumber = Math.floor(parseInt(tokenData.tokenId) / 1000000);
 let mintNumber = parseInt(tokenData.tokenId) % (projectNumber * 1000000);
 let seed = parseInt(tokenData.hash.slice(0, 16), 16);
@@ -494,7 +496,7 @@ let mapListToWeightedKeys = (list) => {
   return Object.entries(list)
     .filter((pair) => pair[0])
     .reduce((obj, arr) => {
-      obj[arr[0]] = arr[1]?.weight || 1;
+      obj[arr[0]] = (arr[1] && arr[1].weight) || 1;
       return obj;
     }, {});
 };
@@ -517,7 +519,7 @@ let allFeatureList = {
 //------------------------------
 
 function getValueOfList(list, key) {
-  return list[key]?.value || list[key];
+  return (list[key] && list[key].value) || list[key];
 }
 
 function renderFeatures() {

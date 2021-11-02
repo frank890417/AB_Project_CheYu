@@ -1,0 +1,20 @@
+{
+  "name": "ab_project_cheyu",
+  "version": "1.0.0",
+  "description": "",
+  "main": "Sketch.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "minify Sketch.js > Sketch.min.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/frank890417/AB_Project_CheYu.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/frank890417/AB_Project_CheYu/issues"
+  },
+  "homepage": "https://github.com/frank890417/AB_Project_CheYu#readme"
+}
