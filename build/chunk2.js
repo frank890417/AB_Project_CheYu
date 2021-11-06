@@ -1,11 +1,23 @@
 
 function setup() {
-  // pixelDensity(2);
-  let SZ = Math.min(WIDTH, HEIGHT);
-  createCanvas(int(SZ), SZ);
+  pixelDensity(2);
+  createCanvas(DIM, DIM);
   // createCanvas(windowWidth, windowHeight);
   mainGraphics = createGraphics(width, height);
   fullCanvasTexture = createGraphics(width, height);
+
+  // mainGraphics.translate(width / 2, height / 2);
+  mainGraphics.scale(DIM / DEFAULT_SIZE);
+  fullCanvasTexture.scale(DIM / DEFAULT_SIZE);
+  // mainGraphics.translate(-width / 2, -height / 2);
+  console.log(`scale: ${DIM / DEFAULT_SIZE}`);
+
+  console.log(DIM, DEFAULT_SIZE);
+  width = DEFAULT_SIZE;
+  height = DEFAULT_SIZE;
+  // 300/1200
+  // 2400/1200
+  // mainGraphics.translate(-width / 2, -height / 2);
 
   let textureGridSize = 120;
 

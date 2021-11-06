@@ -1,4 +1,12 @@
 
+// console.log(tokenData);
+var features = {};
+let projectNumber = Math.floor(parseInt(tokenData.tokenId) / 1000000);
+let mintNumber = parseInt(tokenData.tokenId) % (projectNumber * 1000000);
+let seed = parseInt(tokenData.hash.slice(0, 16), 16);
+
+// Gets you an array of 32 parameters from the hash ranging from 0-255
+let rawParams = setupParametersFromTokenData(tokenData);
 class Random {
   constructor(seed) {
     this.seed = seed;
@@ -628,7 +636,7 @@ function divAng(stR, edR, stAng, edAng, d) {
 
 let particles = [];
 let ang;
-var DEFAULT_SIZE = 1000;
+var DEFAULT_SIZE = 1200;
 var WIDTH = window.innerWidth;
 var HEIGHT = window.innerHeight;
 var DIM = Math.min(WIDTH, HEIGHT);
