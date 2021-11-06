@@ -1,4 +1,26 @@
 
+/*
+  Helper functions
+*/
+
+// parse parameters
+function setupParametersFromTokenData(token) {
+  let hashPairs = [];
+  //parse hash
+  for (let j = 0; j < 32; j++) {
+    hashPairs.push(token.hash.slice(2 + j * 2, 4 + j * 2));
+  }
+  // map to 0-255
+  return hashPairs.map((x) => {
+    return parseInt(x, 16);
+  });
+}
+
+function generateSeedFromTokenData(token) {
+  return parseInt(token.hash.slice(0, 16), 16);
+}
+
+//%
 // console.log(tokenData);
 
 let projectNumber = Math.floor(parseInt(tokenData.tokenId) / 1000000);
@@ -540,105 +562,3 @@ function renderFeatures() {
 }
 
 renderFeatures();
-//#FEATURE_END
-
-function preload() {
-  // canvasTexture = loadImage("canvas.jpeg");
-  canvasTexture = loadImage(canvasTextureBase64);
-}
-
-function div(x, y, w, h, z) {
-  if (R.random_dec() < 0.5 + z / 8 && z > 0) {
-    let ratio = R.random_num(0.2, 0.8);
-    if (R.random_dec() < 0.3) {
-      let ww = w * ratio;
-      div(x, y, ww, h, z - 1);
-      div(x + ww, y, w - ww, h, z - 1);
-    } else {
-      let hh = h * ratio;
-      div(x, y, w, hh, z - 1);
-      div(x, y + hh, w, h - hh, z - 1);
-    }
-  } else {
-    let newArea = new Area({
-      x,
-      y,
-      w,
-      h,
-      type: getValueOfList(
-        areaTypes,
-        R.random_choice_weight(mapListToWeightedKeys(areaTypes))
-      ),
-      sx: R.random_num(0, 2),
-      sy: R.random_num(0, 2),
-      noiseX: R.random_num(0, 100),
-      noiseY: R.random_num(0, 1000),
-      noiseXAmp: R.random_num(-5, 5),
-      noiseYAmp: R.random_num(-5, 5),
-      gravity: createVector(
-        R.random_num(-0.15, 0.15),
-        R.random_num(-0.15, 0.15)
-      ),
-      colors: useColorSet,
-    });
-    newArea.draw();
-    areas.push(newArea);
-  }
-}
-
-function divAng(stR, edR, stAng, edAng, d) {
-  if (R.random() < 0.3) {
-    d -= 1;
-  }
-  let ratio = R.random_num(0.3, 0.7);
-  if (d > 0) {
-    if (R.random() < 0.4) {
-      let splitNum = R.random_choice([2, 2, 2, 2, 2, 3, 4]);
-      for (var o = 1; o <= splitNum; o++) {
-        divAng(
-          stR,
-          edR,
-          stAng + ((o - 1) * (edAng - stAng)) / splitNum,
-          stAng + (o * (edAng - stAng)) / splitNum,
-          d - 1
-        );
-      }
-    } else {
-      divAng(stR, stR + ratio * (edR - stR), stAng, edAng, d - 1);
-      divAng(stR + ratio * (edR - stR), edR, stAng, edAng, d - 1);
-    }
-  } else {
-    let newArea = new AngArea({
-      stR,
-      edR,
-      stAng,
-      edAng,
-      d,
-      type: getValueOfList(
-        areaTypes,
-        R.random_choice_weight(mapListToWeightedKeys(areaTypes))
-      ),
-      sx: R.random_num(0, 2),
-      sy: R.random_num(0, 2),
-      noiseX: R.random_num(0, 100),
-      noiseY: R.random_num(0, 1000),
-      noiseXAmp: R.random_num(-5, 5),
-      noiseYAmp: R.random_num(-5, 5),
-      gravity: createVector(
-        R.random_num(-0.15, 0.15),
-        R.random_num(-0.15, 0.15)
-      ),
-      colors: useColorSet,
-    });
-    newArea.draw();
-    areas.push(newArea);
-  }
-}
-
-let particles = [];
-let ang;
-var DEFAULT_SIZE = 1200;
-var WIDTH = window.innerWidth;
-var HEIGHT = window.innerHeight;
-var DIM = Math.min(WIDTH, HEIGHT);
-var M = DIM / DEFAULT_SIZE;

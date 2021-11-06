@@ -10,9 +10,6 @@ function setup() {
   mainGraphics.scale(DIM / DEFAULT_SIZE);
   fullCanvasTexture.scale(DIM / DEFAULT_SIZE);
   // mainGraphics.translate(-width / 2, -height / 2);
-  console.log(`scale: ${DIM / DEFAULT_SIZE}`);
-
-  console.log(DIM, DEFAULT_SIZE);
   width = DEFAULT_SIZE;
   height = DEFAULT_SIZE;
   // 300/1200
