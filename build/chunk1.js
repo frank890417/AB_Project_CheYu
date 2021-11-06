@@ -1,6 +1,7 @@
 
 // console.log(tokenData);
 var features = {};
+//#FEATURE_START
 let projectNumber = Math.floor(parseInt(tokenData.tokenId) / 1000000);
 let mintNumber = parseInt(tokenData.tokenId) % (projectNumber * 1000000);
 let seed = parseInt(tokenData.hash.slice(0, 16), 16);
@@ -540,8 +541,10 @@ function renderFeatures() {
   useSpecialType = getValueOfList(specialTypes, features.SpecialType);
 }
 
+renderFeatures();
+//#FEATURE_END
+
 function preload() {
-  renderFeatures();
   // canvasTexture = loadImage("canvas.jpeg");
   canvasTexture = loadImage(canvasTextureBase64);
 }

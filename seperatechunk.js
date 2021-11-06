@@ -26,4 +26,16 @@ fs.readFile("Sketch.js", "utf8", function (err, contents) {
       }
     );
   });
+
+  let featureScript = contents
+    .split("//#FEATURE_START")[1]
+    .split("//#FEATURE_END")[0];
+  fs.writeFileSync(`${dir}/feature.js`, featureScript);
+  child.exec(
+    `minify ${dir}/feature.js > ${dir}/feature.min.js`,
+    (error, stdout, stderr) => {
+      if (error) {
+      }
+    }
+  );
 });
