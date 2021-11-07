@@ -35,6 +35,7 @@ fs.readFile("Sketch.js", "utf8", function (err, contents) {
     `minify ${dir}/feature.js > ${dir}/feature.min.js`,
     (error, stdout, stderr) => {
       if (error) {
+        console.error(error)
       }
     }
   );

@@ -2,6 +2,8 @@
 function setup() {
   pixelDensity(2);
   createCanvas(DIM, DIM);
+  noiseSeed(seed)
+  randomSeed(seed)
   // createCanvas(windowWidth, windowHeight);
   mainGraphics = createGraphics(width, height);
   fullCanvasTexture = createGraphics(width, height);
