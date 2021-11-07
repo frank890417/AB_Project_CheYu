@@ -407,8 +407,8 @@ let specialTypes = {
 };
 let particleCounts = {
   Less: {
-    weight: 2,
-    value: 80,
+    weight: 1,
+    value: 85,
   },
   Medium: {
     weight: 5,
@@ -417,7 +417,7 @@ let particleCounts = {
   More: {
     weight: 1,
     value: 120,
-  },
+  }
 };
 let particleSizes = {
   // XS: {
@@ -426,19 +426,19 @@ let particleSizes = {
   // },
   S: {
     weight: 5,
-    value: 50,
+    value: 55,
   },
   M: {
     weight: 5,
     value: 65,
   },
   L: {
-    weight: 4,
-    value: 80,
+    weight: 5,
+    value: 72,
   },
   XL: {
     weight: 2,
-    value: 95,
+    value: 85,
   },
 };
 let areaTypes = {
@@ -473,7 +473,7 @@ let areaTypes = {
 };
 let emitTypes = {
   even: {
-    weight: 10,
+    weight: 12,
     value: "Even",
   },
   random: {
@@ -492,6 +492,10 @@ let emitTypes = {
     weight: 2,
     value: "LinearSlope",
   },
+  circular: {
+    weight: 3,
+    value: "Circular",
+  }
 };
 let divisionTypes = {
   rect: {
@@ -677,6 +681,7 @@ function setup() {
   createCanvas(DIM, DIM);
   noiseSeed(seed)
   randomSeed(seed)
+  background(0)
   // createCanvas(windowWidth, windowHeight);
   mainGraphics = createGraphics(width, height);
   fullCanvasTexture = createGraphics(width, height);
@@ -740,10 +745,11 @@ function setup() {
     div(0, 0, width, height, int(R.random_num(2, 4)));
   }
   if (useDivisionType == "Ang") {
-    divAng(0, width, 0, 2 * PI, int(R.random_num(2, 5)));
+    divAng(0, width, 0, 2 * PI, int(R.random_num(2, 4)));
   }
   features.AreaCount = areas.length;
 
+  let freq = R.random_num(0.5,2)
   for (var i = 0; i < useParticleCount; i++) {
     let pColor = R.random_choice(useColorSet);
     let useEmitVelocity;
@@ -763,7 +769,7 @@ function setup() {
       useR = sin(i / 4) * 10 + 12;
     } else if (useEmitType == "LinearHorzontal") {
       useEmitVelocity = createVector(0, 1)
-        .rotate(sin((i / useParticleCount) * 2 * PI))
+        .rotate(sin((i / useParticleCount) * freq * PI))
         .mult(R.random_num(2, 6));
       useEmitPosition = createVector(
         map(i, 0, useParticleCount, 0, width),
@@ -771,7 +777,7 @@ function setup() {
       );
     } else if (useEmitType == "LinearVertical") {
       useEmitVelocity = createVector(1, 0)
-        .rotate(sin((i / useParticleCount) * 2 * PI))
+        .rotate(sin((i / useParticleCount) * freq * PI))
         .mult(R.random_num(2, 6));
       useEmitPosition = createVector(
         width / 2,
@@ -779,12 +785,19 @@ function setup() {
       );
     } else if (useEmitType == "LinearSlope") {
       useEmitVelocity = createVector(1, 0)
-        .rotate(sin((i / useParticleCount) * 2 * PI))
+        .rotate(sin((i / useParticleCount) * freq * PI))
         .mult(R.random_num(2, 6));
       useEmitPosition = createVector(
         map(i, 0, useParticleCount, 0, width),
         map(i, 0, useParticleCount, 0, height)
       );
+    } else if (useEmitType == "Circular"){
+      useEmitVelocity = createVector(1, 0)
+        .rotate(map(i,0,useParticleCount,0,PI*freq/2))
+        .mult(R.random_num(2, 5));
+      useEmitPosition = createVector(
+        width*0.3,0
+      ).rotate(i).add(width/2,height/2);
     }
     particles.push(
       new Particle({
