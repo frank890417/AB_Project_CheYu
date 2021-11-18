@@ -93,16 +93,17 @@ class Particle {
       p: createVector(0, 0),
       v: createVector(0, 0),
       a: createVector(0, 0),
-      r: R.random_num(0, useParticleSize) * R.random_num(0.1, 1) + 1,
-      polarity: R.random_choice([-1, 1]),
+     
       canGenCount: 2,
       generation: 0,
+      polarity: R.random_choice([-1, 1]),
+      r: R.random_num(0, useParticleSize) * R.random_num(0.1, 1) + 1,
       id: int(R.random_num(0, 1000)),
       vFriction: R.random_num(0.99, 1),
       rFactor: R.random_num(0.99, 0.9995),
       affectFactor: R.random_num(0.8, 1.2),
-      area: null,
       hasFruit: R.random_num() < 0.5,
+      area: null,
       color: "white",
       life: 500,
     };
@@ -171,11 +172,11 @@ class Area {
       ),
       sx: R.random_num(0, 2),
       sy: R.random_num(0, 2),
-      polarAmp: R.random_num(-5, 5),
+      polarAmp: R.random_num(-useChaosFactor, useChaosFactor),
       noiseX: R.random_num(0, 100),
       noiseY: R.random_num(0, 1000),
-      noiseXAmp: R.random_num(-5, 5),
-      noiseYAmp: R.random_num(-5, 5),
+      noiseXAmp: R.random_num(-useChaosFactor, useChaosFactor),
+      noiseYAmp: R.random_num(-useChaosFactor, useChaosFactor),
       parallelAngle: R.random_num(0, 2 * PI),
       parallelAmp: R.random_num(0.0001, 0.002),
       gravity: createVector(R.random_num(-0.1, 0.1), R.random_num(-0.1, 0.1)),
@@ -197,8 +198,8 @@ class Area {
       mainGraphics.stroke(this.color);
     }
     if (useSpecialType == "Kinetic") {
-      mainGraphics.translate(R.random_num(-8, 8), R.random_num(-8, 8));
-      mainGraphics.rotate(R.random_num(-0.03, 0.03));
+      mainGraphics.translate(R.random_num(-useChaosFactor, useChaosFactor), R.random_num(-useChaosFactor, useChaosFactor));
+      mainGraphics.rotate(R.random_num(-useChaosFactor*0.01,useChaosFactor*0.01));
     }
     mainGraphics.rect(this.x, this.y, this.w, this.h);
     //debug type text
@@ -208,37 +209,38 @@ class Area {
     mainGraphics.pop();
   }
   affect(particle) {
+    let useChaosFactorMult = useChaosFactor/9
     if (this.type == "field") {
       particle.v.x +=
-        (cos((particle.p.x * this.sx) / 10) / 10) * particle.affectFactor;
+        (cos((particle.p.x * this.sx) / 10) / 10) * particle.affectFactor*(useChaosFactorMult);
       particle.v.y +=
-        (sin((particle.p.y * this.sy) / 10) / 10) * particle.affectFactor;
+        (sin((particle.p.y * this.sy) / 10) / 10) * particle.affectFactor*(useChaosFactorMult);
     }
     if (this.type == "noise") {
       particle.v.x +=
-        (noise((particle.p.x * this.sx) / 10) - 0.5) * particle.affectFactor;
+        (noise((particle.p.x * this.sx) / 10) - 0.5) * particle.affectFactor*(useChaosFactorMult);
       particle.v.y +=
-        (noise((particle.p.y * this.sy) / 10) - 0.5) * particle.affectFactor;
+        (noise((particle.p.y * this.sy) / 10) - 0.5) * particle.affectFactor*(useChaosFactorMult);
     }
     if (this.type == "curl") {
       particle.v.rotate(
         ((this.polarAmp * particle.polarity) / pow(particle.r, 2)) *
-          particle.affectFactor
+          particle.affectFactor*(useChaosFactorMult)
       );
     }
     if (this.type == "square") {
       particle.v.x +=
         (cos(particle.p.x / 10 + particle.p.y / 20) / 2) *
-        particle.affectFactor;
+        particle.affectFactor*(useChaosFactorMult);
       particle.v.y +=
         (sin(particle.p.y / 10 + particle.p.x / 20) / 2) *
-        particle.affectFactor;
+        particle.affectFactor*(useChaosFactorMult);
     }
     if (this.type == "step") {
       particle.p.x +=
-        cos(int(particle.p.x / 40) * 2) * 2 * particle.affectFactor;
+        cos(int(particle.p.x / 40) * 2) * 2 * particle.affectFactor*(useChaosFactorMult);
       particle.p.y +=
-        cos(int(particle.p.y / 40) * 2) * 2 * particle.affectFactor;
+        cos(int(particle.p.y / 40) * 2) * 2 * particle.affectFactor*(useChaosFactorMult);
     }
     if (this.type == "parallel") {
       if (particle.v.heading() != this.parallelAngle) {
@@ -278,7 +280,7 @@ class AngArea extends Area {
     mainGraphics.arc(0, 0, useR * 2, useR * 2, this.stAng, this.edAng, OPEN);
     mainGraphics.pop();
     if (useSpecialType == "Kinetic") {
-      mainGraphics.translate(R.random_num(-8, 8), R.random_num(-8, 8));
+      mainGraphics.translate(R.random_num(-useChaosFactor, useChaosFactor), R.random_num(-useChaosFactor, useChaosFactor));
       mainGraphics.rotate(R.random_num(-0.03, 0.03));
     }
 
@@ -382,11 +384,11 @@ let startPositions = {
 };
 let specialTypes = {
   None: {
-    weight: 10,
+    weight: 30,
     value: "None",
   },
   Wireframe: {
-    weight: 2,
+    weight: 14,
     value: "Wireframe",
   },
   // Kinetic: {
@@ -394,14 +396,18 @@ let specialTypes = {
   //   value: "Kinetic",
   // },
   Spray: {
-    weight: 1,
+    weight: 6,
     value: "Spray",
+  },
+  Hamily: {
+    weight: 1,
+    value: "Hamily",
   },
 };
 let particleCounts = {
   Less: {
-    weight: 2,
-    value: 80,
+    weight: 1,
+    value: 85,
   },
   Medium: {
     weight: 5,
@@ -410,7 +416,7 @@ let particleCounts = {
   More: {
     weight: 1,
     value: 120,
-  },
+  }
 };
 let particleSizes = {
   // XS: {
@@ -418,20 +424,20 @@ let particleSizes = {
   //   value: 30,
   // },
   S: {
-    weight: 5,
-    value: 50,
+    weight: 2,
+    value: 55,
   },
   M: {
-    weight: 5,
+    weight: 3,
     value: 65,
   },
   L: {
-    weight: 4,
-    value: 80,
+    weight: 5,
+    value: 72,
   },
   XL: {
-    weight: 2,
-    value: 95,
+    weight: 1,
+    value: 85,
   },
 };
 let areaTypes = {
@@ -466,7 +472,7 @@ let areaTypes = {
 };
 let emitTypes = {
   even: {
-    weight: 10,
+    weight: 12,
     value: "Even",
   },
   random: {
@@ -485,6 +491,10 @@ let emitTypes = {
     weight: 2,
     value: "LinearSlope",
   },
+  circular: {
+    weight: 3,
+    value: "Circular",
+  }
 };
 let divisionTypes = {
   rect: {
@@ -496,6 +506,7 @@ let divisionTypes = {
     value: "Ang",
   },
 };
+ 
 let useStartPosition;
 let useParticleCount;
 let useColorSet;
@@ -503,6 +514,7 @@ let useParticleSize;
 let useDivisionType;
 let useEmitType;
 let useSpecialType;
+let useChaosFactor = 5;
 let showCanvasTexture = true;
 let mainGraphics;
 let areas = [];
@@ -559,6 +571,12 @@ function renderFeatures() {
 
   features.SpecialType = R.random_choice_weight(allFeatureList.SpecialType);
   useSpecialType = getValueOfList(specialTypes, features.SpecialType);
+
+  useChaosFactor = R.random_choice([0,1,2,2,3,3,3,4,4,4,5,5,5,5,5,6,6,6,6,7,7,7,7,8,8,9,10])
+  features.ChaosFactor = useChaosFactor
+ 
+
+
 }
 
 renderFeatures();

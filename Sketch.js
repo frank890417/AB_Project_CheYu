@@ -4,6 +4,7 @@ let canvasTextureBase64 = `data:image/jpeg;base64, `;
   canvasTextureBase64 += `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`;
 })();
 
+//rememer to turn on this line when deploy
 var features = {};
 //#FEATURE_START
 /*
@@ -100,16 +101,17 @@ class Particle {
       p: createVector(0, 0),
       v: createVector(0, 0),
       a: createVector(0, 0),
-      r: R.random_num(0, useParticleSize) * R.random_num(0.1, 1) + 1,
-      polarity: R.random_choice([-1, 1]),
+     
       canGenCount: 2,
       generation: 0,
+      polarity: R.random_choice([-1, 1]),
+      r: R.random_num(0, useParticleSize) * R.random_num(0.1, 1) + 1,
       id: int(R.random_num(0, 1000)),
       vFriction: R.random_num(0.99, 1),
       rFactor: R.random_num(0.99, 0.9995),
       affectFactor: R.random_num(0.8, 1.2),
-      area: null,
       hasFruit: R.random_num() < 0.5,
+      area: null,
       color: "white",
       life: 500,
     };
@@ -178,11 +180,11 @@ class Area {
       ),
       sx: R.random_num(0, 2),
       sy: R.random_num(0, 2),
-      polarAmp: R.random_num(-5, 5),
+      polarAmp: R.random_num(-useChaosFactor, useChaosFactor),
       noiseX: R.random_num(0, 100),
       noiseY: R.random_num(0, 1000),
-      noiseXAmp: R.random_num(-5, 5),
-      noiseYAmp: R.random_num(-5, 5),
+      noiseXAmp: R.random_num(-useChaosFactor, useChaosFactor),
+      noiseYAmp: R.random_num(-useChaosFactor, useChaosFactor),
       parallelAngle: R.random_num(0, 2 * PI),
       parallelAmp: R.random_num(0.0001, 0.002),
       gravity: createVector(R.random_num(-0.1, 0.1), R.random_num(-0.1, 0.1)),
@@ -204,8 +206,8 @@ class Area {
       mainGraphics.stroke(this.color);
     }
     if (useSpecialType == "Kinetic") {
-      mainGraphics.translate(R.random_num(-8, 8), R.random_num(-8, 8));
-      mainGraphics.rotate(R.random_num(-0.03, 0.03));
+      mainGraphics.translate(R.random_num(-useChaosFactor, useChaosFactor), R.random_num(-useChaosFactor, useChaosFactor));
+      mainGraphics.rotate(R.random_num(-useChaosFactor*0.01,useChaosFactor*0.01));
     }
     mainGraphics.rect(this.x, this.y, this.w, this.h);
     //debug type text
@@ -215,37 +217,38 @@ class Area {
     mainGraphics.pop();
   }
   affect(particle) {
+    let useChaosFactorMult = useChaosFactor/9
     if (this.type == "field") {
       particle.v.x +=
-        (cos((particle.p.x * this.sx) / 10) / 10) * particle.affectFactor;
+        (cos((particle.p.x * this.sx) / 10) / 10) * particle.affectFactor*(useChaosFactorMult);
       particle.v.y +=
-        (sin((particle.p.y * this.sy) / 10) / 10) * particle.affectFactor;
+        (sin((particle.p.y * this.sy) / 10) / 10) * particle.affectFactor*(useChaosFactorMult);
     }
     if (this.type == "noise") {
       particle.v.x +=
-        (noise((particle.p.x * this.sx) / 10) - 0.5) * particle.affectFactor;
+        (noise((particle.p.x * this.sx) / 10) - 0.5) * particle.affectFactor*(useChaosFactorMult);
       particle.v.y +=
-        (noise((particle.p.y * this.sy) / 10) - 0.5) * particle.affectFactor;
+        (noise((particle.p.y * this.sy) / 10) - 0.5) * particle.affectFactor*(useChaosFactorMult);
     }
     if (this.type == "curl") {
       particle.v.rotate(
         ((this.polarAmp * particle.polarity) / pow(particle.r, 2)) *
-          particle.affectFactor
+          particle.affectFactor*(useChaosFactorMult)
       );
     }
     if (this.type == "square") {
       particle.v.x +=
         (cos(particle.p.x / 10 + particle.p.y / 20) / 2) *
-        particle.affectFactor;
+        particle.affectFactor*(useChaosFactorMult);
       particle.v.y +=
         (sin(particle.p.y / 10 + particle.p.x / 20) / 2) *
-        particle.affectFactor;
+        particle.affectFactor*(useChaosFactorMult);
     }
     if (this.type == "step") {
       particle.p.x +=
-        cos(int(particle.p.x / 40) * 2) * 2 * particle.affectFactor;
+        cos(int(particle.p.x / 40) * 2) * 2 * particle.affectFactor*(useChaosFactorMult);
       particle.p.y +=
-        cos(int(particle.p.y / 40) * 2) * 2 * particle.affectFactor;
+        cos(int(particle.p.y / 40) * 2) * 2 * particle.affectFactor*(useChaosFactorMult);
     }
     if (this.type == "parallel") {
       if (particle.v.heading() != this.parallelAngle) {
@@ -285,7 +288,7 @@ class AngArea extends Area {
     mainGraphics.arc(0, 0, useR * 2, useR * 2, this.stAng, this.edAng, OPEN);
     mainGraphics.pop();
     if (useSpecialType == "Kinetic") {
-      mainGraphics.translate(R.random_num(-8, 8), R.random_num(-8, 8));
+      mainGraphics.translate(R.random_num(-useChaosFactor, useChaosFactor), R.random_num(-useChaosFactor, useChaosFactor));
       mainGraphics.rotate(R.random_num(-0.03, 0.03));
     }
 
@@ -389,11 +392,11 @@ let startPositions = {
 };
 let specialTypes = {
   None: {
-    weight: 10,
+    weight: 30,
     value: "None",
   },
   Wireframe: {
-    weight: 2,
+    weight: 14,
     value: "Wireframe",
   },
   // Kinetic: {
@@ -401,8 +404,12 @@ let specialTypes = {
   //   value: "Kinetic",
   // },
   Spray: {
-    weight: 1,
+    weight: 6,
     value: "Spray",
+  },
+  Hamily: {
+    weight: 1,
+    value: "Hamily",
   },
 };
 let particleCounts = {
@@ -425,11 +432,11 @@ let particleSizes = {
   //   value: 30,
   // },
   S: {
-    weight: 5,
+    weight: 2,
     value: 55,
   },
   M: {
-    weight: 5,
+    weight: 3,
     value: 65,
   },
   L: {
@@ -437,7 +444,7 @@ let particleSizes = {
     value: 72,
   },
   XL: {
-    weight: 2,
+    weight: 1,
     value: 85,
   },
 };
@@ -507,6 +514,7 @@ let divisionTypes = {
     value: "Ang",
   },
 };
+ 
 let useStartPosition;
 let useParticleCount;
 let useColorSet;
@@ -514,6 +522,7 @@ let useParticleSize;
 let useDivisionType;
 let useEmitType;
 let useSpecialType;
+let useChaosFactor = 5;
 let showCanvasTexture = true;
 let mainGraphics;
 let areas = [];
@@ -570,6 +579,12 @@ function renderFeatures() {
 
   features.SpecialType = R.random_choice_weight(allFeatureList.SpecialType);
   useSpecialType = getValueOfList(specialTypes, features.SpecialType);
+
+  useChaosFactor = R.random_choice([0,1,2,2,3,3,3,4,4,4,5,5,5,5,5,6,6,6,6,7,7,7,7,8,8,9,10])
+  features.ChaosFactor = useChaosFactor
+ 
+
+
 }
 
 renderFeatures();
@@ -677,6 +692,8 @@ var DIM = Math.min(WIDTH, HEIGHT);
 var M = DIM / DEFAULT_SIZE;
 //%
 function setup() {
+  console.log("Artist: Che-Yu Wu")
+  console.log("https://twitter.com/cheyuwu345")
   pixelDensity(2);
   createCanvas(DIM, DIM);
   noiseSeed(seed)
@@ -757,20 +774,22 @@ function setup() {
       useStartPosition[0] * width,
       useStartPosition[1] * height
     );
+    let minV = useChaosFactor>4?2:4
+    let maxV = useChaosFactor>4?6:4
     let useR = R.random_num(0, useParticleSize) * R.random_num(0.05, 1) + 1;
     if (useEmitType == "Random") {
       useEmitVelocity = createVector(0, 1)
         .rotate(R.random_num(0, 2 * PI))
-        .mult(R.random_num(2, 6));
+        .mult(R.random_num(minV, maxV));
     } else if (useEmitType == "Even") {
       useEmitVelocity = createVector(0, 1)
         .rotate(map(i, 0, useParticleCount, 0, PI))
-        .mult(R.random_num(2, 6));
-      useR = sin(i / 4) * 10 + 12;
+        .mult(R.random_num(minV, maxV));
+      useR = sin(i / 4) * useChaosFactor + 12;
     } else if (useEmitType == "LinearHorzontal") {
       useEmitVelocity = createVector(0, 1)
         .rotate(sin((i / useParticleCount) * freq * PI))
-        .mult(R.random_num(2, 6));
+        .mult(R.random_num(minV, maxV));
       useEmitPosition = createVector(
         map(i, 0, useParticleCount, 0, width),
         height / 2
@@ -778,7 +797,7 @@ function setup() {
     } else if (useEmitType == "LinearVertical") {
       useEmitVelocity = createVector(1, 0)
         .rotate(sin((i / useParticleCount) * freq * PI))
-        .mult(R.random_num(2, 6));
+        .mult(R.random_num(minV, maxV));
       useEmitPosition = createVector(
         width / 2,
         map(i, 0, useParticleCount, 0, height)
@@ -786,7 +805,7 @@ function setup() {
     } else if (useEmitType == "LinearSlope") {
       useEmitVelocity = createVector(1, 0)
         .rotate(sin((i / useParticleCount) * freq * PI))
-        .mult(R.random_num(2, 6));
+        .mult(R.random_num(minV, maxV));
       useEmitPosition = createVector(
         map(i, 0, useParticleCount, 0, width),
         map(i, 0, useParticleCount, 0, height)
@@ -794,18 +813,45 @@ function setup() {
     } else if (useEmitType == "Circular"){
       useEmitVelocity = createVector(1, 0)
         .rotate(map(i,0,useParticleCount,0,PI*freq/2))
-        .mult(R.random_num(2, 5));
+        .mult(R.random_num(minV, maxV));
       useEmitPosition = createVector(
         width*0.3,0
       ).rotate(i).add(width/2,height/2);
     }
+    let particleMeta = {
+      p: useEmitPosition,
+      v: useEmitVelocity,
+      r: useR,
+      color: pColor,
+
+      polarity: R.random_choice([-1, 1]),
+      r: R.random_num(0, useParticleSize) * R.random_num(0.1, 1) + 1,
+      vFriction: R.random_num(0.99, 1),
+      rFactor: R.random_num(0.99, 0.9995),
+      affectFactor: R.random_num(0.8, 1.2), 
+    }
+    if (useChaosFactor>=8){
+      particleMeta.p.x+=R.random_num(-useChaosFactor,useChaosFactor)
+      particleMeta.p.y+=R.random_num(-useChaosFactor,useChaosFactor)
+    }
+    if (useChaosFactor<=4){
+      particleMeta.polarity = 1
+
+      particleMeta.v = createVector(1, 0)
+       .rotate(sin((i / useParticleCount*useChaosFactor) * freq * PI))
+        .mult(5);
+    }
+    if (useChaosFactor<=3){
+      particleMeta.color = useColorSet[ int(i/10)%useColorSet.length]
+    }
+    if (useChaosFactor<=2){
+      particleMeta.affectFactor = 1
+      particleMeta.r = abs(sin(i))*useParticleSize*0.8
+     
+      
+    }
     particles.push(
-      new Particle({
-        p: useEmitPosition,
-        v: useEmitVelocity,
-        r: useR,
-        color: pColor,
-      })
+      new Particle(particleMeta)
     );
   }
 
@@ -860,7 +906,7 @@ function draw() {
   // Draw Hash
   if (showHash) {
     fill(0);
-    textSize(20);
+    textSize(18);
     textFont("Courier");
     // select('canvas').elt.style.letterSpacing = "5px";
     textAlign(RIGHT);
@@ -868,16 +914,20 @@ function draw() {
     for (var textId = 0; textId < tokenData.hash.length; textId++) {
       // let xx = textId*15+15+mouseX, yy = mouseY + sin(frameCount/50+xx/50)*50 + noise(frameCount/50+xx/50)*100
       // let xx = textId*15+15+mouseX, yy = mouseY + sin(frameCount/50+xx/50)*50
-      // let xx = textId*15+15+mouseX, yy = mouseY
-      let xx = textId * 15 + 30,
-        yy = height - 30;
+ 
+      let xx = textId * 14 + 50;
+          yy = height*0.95 *DIM / DEFAULT_SIZE;
+      if (showHashMouse){
+        xx = textId*14+15+mouseX
+          yy = mouseY
+      }
       // for(let xx=0;xx<width;xx+=20){
       //   for(let yy=0;yy<height;yy+=20){
 
       areas.forEach((area) => {
         if (
           area.isParticleInArea({
-            p: createVector(xx, yy),
+            p: createVector(xx/DIM * DEFAULT_SIZE, yy/DIM * DEFAULT_SIZE),
           })
         ) {
           let ar = color(area.color);
@@ -885,10 +935,13 @@ function draw() {
             0.2126 * ar._getRed() +
             0.7152 * ar._getGreen() +
             0.0722 * ar._getBlue();
-          if (b > 255 / 2) {
+          if (b > 255 / 2 ) {
             fill(0);
           } else {
             fill(255);
+          }
+          if (useSpecialType=="Wireframe"){
+            fill(255)
           }
         }
       });
@@ -903,6 +956,7 @@ function draw() {
   }
 }
 let showHash = false;
+let showHashMouse;
 function keyPressed() {
   if (key == "s") {
     save("CYW_Electriz - " + tokenData.hash + ".png");
@@ -912,6 +966,10 @@ function keyPressed() {
   }
   if (key == " ") {
     showHash = !showHash;
+    console.log("Showhash",showHash)
+  }
+  if (key=="m"){
+    showHashMouse =!showHashMouse
   }
 }
 
